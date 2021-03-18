@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 import logging
 from PyQt5.QtWidgets import QApplication
 
-from pynta.model.experiment.nanoparticle_tracking.np_tracking import NPTracking
+from pynta.model.experiment.nanospring_tracking.np_tracking import NPTracking
 from pynta.util.log import get_logger
 from pynta.view.main import MainWindow
 

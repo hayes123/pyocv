@@ -9,7 +9,7 @@ user:
 saving:
   auto_save: False
   auto_save_waterfall: True
-  directory: C:\Users\carat002\Data
+  directory: C:\Users\ebrah002\Data
   filename_video: Video # Can be the same filename for video and photo
   filename_photo: Snap
   filename_tracks: Tracks

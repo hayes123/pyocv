@@ -19,7 +19,7 @@
 """
 import time
 import numpy as np
-from pynta.model.cameras.simulate_brownian import SimBrownian
+from pynta.model.cameras.simulate_nanospring import SimBrownian
 from pynta.util.log import get_logger
 from pynta import Q_
 from .base_camera import BaseCamera
@@ -33,10 +33,10 @@ class Camera(BaseCamera):
         super().__init__(camera)
 
         self.running = False
-        self.xsize = 1080
-        self.ysize = 720
+        self.xsize = 255
+        self.ysize = 200
         self.sb = SimBrownian((self.xsize, self.ysize))
-        self.maxX = 1800
+        self.maxX = 800
         self.maxY = 720
         self.exposure = Q_('10ms')
         self.X = [0, self.maxX-1]
