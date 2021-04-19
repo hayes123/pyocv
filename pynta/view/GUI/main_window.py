@@ -8,7 +8,7 @@ from pynta.util.log import get_logger
 from pynta.view.GUI.camera_viewer_widget import CameraViewerWidget
 from pynta.view.GUI.config_tracking_widget import ConfigTrackingWidget
 from pynta.view.GUI.config_widget import ConfigWidget
-from pynta.view.GUI.histogram_tracks_widget import HistogramTracksWidget
+from pynta.view.GUI.analysis_dock_widget import AnalysisDockWidget
 
 
 class MainWindowGUI(QMainWindow):
@@ -21,7 +21,7 @@ class MainWindowGUI(QMainWindow):
         self.widget_splitter = QSplitter()
 
         self.camera_viewer_widget = CameraViewerWidget()
-        self.histogram_tracks_widget = HistogramTracksWidget(self)
+        self.histogram_tracks_widget = AnalysisDockWidget(self)
         self.widget_splitter.addWidget(self.camera_viewer_widget)
         self.widget_splitter.addWidget(self.histogram_tracks_widget)
         self.widget_splitter.setSizes((750, 750))
