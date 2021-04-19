@@ -31,7 +31,7 @@ class GraphMonitorWidget(QWidget):
         self.c = 50
         self.test_timer = pg.QtCore.QTimer()
         self.test_timer.timeout.connect(self.fake_plot)
-        self.test_timer.start(100)
+        # self.test_timer.start(100)
 
     # For testing purposes:
     def fake_plot(self):
@@ -121,7 +121,8 @@ if __name__ == '__main__':
     app = QApplication([])
 
     win = GraphMonitorWidget(ylabel='pixel brightness', yunits='counts')
+    win.test_timer.start(100)
     win.show()
-    
+
     app.exec()
 

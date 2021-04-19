@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget
 
 from pynta.view.GUI.histogram_widget import HistogramWidget
 from pynta.view.GUI.tracks_widget import TracksWidget
+from pynta.view.GUI.graph_monitor_widget import GraphMonitorWidget
 
 
 class HistogramTracksWidget(QWidget):
@@ -14,6 +15,8 @@ class HistogramTracksWidget(QWidget):
 
         self.histogram_widget = HistogramWidget(self)
         self.tracks_widget = TracksWidget(self)
+        self.graph_widget = GraphMonitorWidget(self)
 
         self.tabWidget.addTab(self.histogram_widget, 'Histogram')
         self.tabWidget.addTab(self.tracks_widget, 'Trajectories')
+        self.tabWidget.addTab(self.graph_widget, 'Intensities')
