@@ -92,6 +92,27 @@ class NPTracking(BaseExperiment):
         self.fps = 0  # Calculates frames per second based on the number of frames received in a period of time
         # sys.excepthook = self.sysexcept  # This is very handy in case there are exceptions that force the program to quit.
 
+    @check_camera  # Don't know yet if this is necessary???
+    def add_monitor_coordinate(self, xy, label=None):
+        """Add a minotor location. If label is None (default) the largest used integer + 1 will be used."""
+        if not 'monitor_coordinates' in self.config:
+            self.config['monitor_coordinates'] = {}
+        if label is None:
+            numbers_used = [k for k in self.config['monitor_coordinates'].keys() if isinstance(k, int)]
+            label = 1 if not numbers_used else max(numbers_used)+1
+        self.config['monitor_coordinates'][label] = xy
+        return label
+
+    def clear_monitor_coordinates(self, label=None):
+        """Specify specific label, of clear all by passing None (default)"""
+        if not 'monitor_coordinates' in self.config or label is None:
+            self.config['monitor_coordinates'] = {}
+        elif label in self.config['monitor_coordinates']:
+            del self.config['monitor_coordinates'][label]
+        else:
+            self.logger.warning("Coordinate not found")
+
+
     def initialize_camera(self):
         """ Initializes the camera to be used to acquire data. The information on the camera should be provided in the
         configuration file and loaded with :meth:`~self.load_configuration`. It will load the camera assuming

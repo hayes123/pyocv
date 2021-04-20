@@ -103,7 +103,7 @@
      <string>Monitor</string>
     </property>
     <addaction name="actionAdd_Monitor_Point"/>
-    <addaction name="actionClear_all"/>
+    <addaction name="actionClear_All"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSnap"/>
@@ -141,6 +141,7 @@
    <addaction name="actionToggle_bg_reduction"/>
    <addaction name="separator"/>
    <addaction name="actionAdd_Monitor_Point"/>
+   <addaction name="actionClear_All"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionLoad_Config">
@@ -348,7 +349,7 @@
     <string>Add point</string>
    </property>
   </action>
-  <action name="actionClear_all">
+  <action name="actionClear_All">
    <property name="icon">
     <iconset>
      <normaloff>../Icons/empty_graph.svg</normaloff>../Icons/empty_graph.svg</iconset>

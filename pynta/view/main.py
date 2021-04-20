@@ -24,6 +24,21 @@ class MainWindow(MainWindowGUI):
         self.update_histogram_worker.data_received.connect(self.update_histogram)
         self.update_histogram_worker.start()
 
+        self.camera_viewer_widget.setup_mouse_click()
+
+    def add_monitor_point(self):
+        self.logger.info('Click to add point.')
+        self.camera_viewer_widget.connect_mouse_clicked(self.add_monitor_point_callback)
+
+    def add_monitor_point_callback(self, coord):
+        print("Adding coordinate", coord)
+        self.experiment.add_monitor_coordinate(coord)
+        self.camera_viewer_widget.connect_mouse_clicked(None)
+        print(self.experiment.config['monitor_coordinates'])
+
+    def clear_monitor_points(self):
+        self.experiment.clear_monitor_coordinates()
+
     def initialize_camera(self):
         self.experiment.initialize_camera()
 
