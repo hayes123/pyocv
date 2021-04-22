@@ -51,6 +51,9 @@ class MainWindow(MainWindowGUI):
             if self.experiment.tracking:
                 locations = self.experiment.temp_locations
                 self.camera_viewer_widget.draw_target_pointer(locations)
+            if self.experiment.monitoring_pixels:
+                monitor_values = self.experiment.temp_monitor_values
+                self.analysis_dock_widget.intensities_widget.update_graph(monitor_values)
 
     def start_movie(self):
         if self.experiment.free_run_running:
@@ -123,11 +126,11 @@ class MainWindow(MainWindowGUI):
         if len(values) > 0:
             vals = np.array(values)[:, 0]
             vals = vals[~np.isnan(vals)]
-            self.histogram_tracks_widget.histogram_widget.update_distribution(vals)
+            self.analysis_dock_widget.histogram_widget.update_distribution(vals)
 
     def update_tracks(self):
         locations = self.experiment.location.relevant_tracks()
-        self.histogram_tracks_widget.tracks_widget.plot_trajectories(locations)
+        self.analysis_dock_widget.tracks_widget.plot_trajectories(locations)
 
     def update_tracking_config(self, config):
         config = dict(
