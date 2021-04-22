@@ -107,7 +107,7 @@ class GraphMonitorWidget(QWidget):
                 dat['time'].popleft()
                 dat['values'].popleft()
             if not dat['time']:
-                empty.append[label]
+                empty.append(label)
             dat['curve'].setData(dat['time'], dat['values'])
         for label in empty:
             self.release_pen(self._data[label]['pen_index'])
