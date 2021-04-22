@@ -202,7 +202,11 @@ if __name__ == "__main__":
     win = CameraViewerWidget()
     data = np.random.randint(0, 125, (40, 100))
     win.update_image(data)
+
+    # To test the click callback
     win.setup_mouse_click()
+    win.connect_mouse_clicked(print)
+
     win.show()
     location = DataFrame([[20, 50], [30, 60]], columns=['x', 'y'])
     win.draw_target_pointer(location)
