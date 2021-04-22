@@ -21,9 +21,9 @@ class MainWindowGUI(QMainWindow):
         self.widget_splitter = QSplitter()
 
         self.camera_viewer_widget = CameraViewerWidget()
-        self.histogram_tracks_widget = AnalysisDockWidget(self)
+        self.analysis_dock_widget = AnalysisDockWidget(self)
         self.widget_splitter.addWidget(self.camera_viewer_widget)
-        self.widget_splitter.addWidget(self.histogram_tracks_widget)
+        self.widget_splitter.addWidget(self.analysis_dock_widget)
         self.widget_splitter.setSizes((750, 750))
         self.central_layout.addWidget(self.widget_splitter)
 
@@ -49,8 +49,8 @@ class MainWindowGUI(QMainWindow):
         self.config_widget.apply_config.connect(self.update_config)
 
     def connect_buttons(self):
-        self.histogram_tracks_widget.button_histogram.clicked.connect(self.calculate_histogram)
-        self.histogram_tracks_widget.button_tracks.clicked.connect(self.update_tracks)
+        self.analysis_dock_widget.button_histogram.clicked.connect(self.calculate_histogram)
+        self.analysis_dock_widget.button_tracks.clicked.connect(self.update_tracks)
 
     def connect_actions(self):
         self.actionClose.triggered.connect(self.safe_close)
