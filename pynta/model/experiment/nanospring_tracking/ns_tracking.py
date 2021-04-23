@@ -8,7 +8,7 @@
     at providing a superior approach, allowing researchers to have real-time information on the sample studied and a
     completely transparent approach regarding algorithms used.
 
-    Nanospring tracking is a special case of NTA in which partices are anchored to the surface and can be subject to
+    Nanospring tracking (NSTracking) is a special case of NTA in which partices are anchored to the surface and can be subject to
     both external oscillatory actuation and thermal diffusion.
 
 
@@ -36,14 +36,13 @@ from pynta.model.experiment.nanospring_tracking.decorators import (check_camera,
                                                                      check_not_acquiring,
                                                                      make_async_thread)
 
-#from pynta.model.experiment.nanospring_tracking.localization import LocateParticles
-
+from pynta.model.experiment.nanospring_tracking.localization import LocateParticles
 from pynta.model.experiment.nanospring_tracking.saver import worker_listener
 from pynta.model.experiment.nanospring_tracking.exceptions import StreamSavingRunning
 from pynta.util import get_logger
 
 
-class NPTracking(BaseExperiment):
+class NSTracking(BaseExperiment):
     """ Experiment class for performing a nanoCET measurement."""
     BACKGROUND_NO_CORRECTION = 0  # No background correction
     BACKGROUND_SINGLE_SNAP = 1
@@ -280,16 +279,6 @@ class NPTracking(BaseExperiment):
         self.stream_saving_process.start()
         self.logger.debug('Started the stream saving process')
 
-    def link_particles(self):
-        """ Starts linking the particles while the acquisition is in progress.
-        """
-        self.logger.info('Starting to link particles')
-        self.link_particles_process = Process(target=link_queue, args=[self.locations_queue, self.publisher._queue,
-                                                                       self.tracks_queue],
-                                              kwargs=self.config['tracking']['link'])
-        self.link_particles_process.start()
-        self.logger.debug('Started the linking process')
-
     def stop_save_stream(self):
         """ Stops saving the stream.
         """
@@ -304,11 +293,11 @@ class NPTracking(BaseExperiment):
         """ Starts the tracking of the particles
         """
         self.tracking = True
-        #self.location.start_tracking('free_run')
+        self.location.start_tracking('free_run')
 
     def stop_tracking(self):
         self.tracking = False
-        #self.location.stop_tracking()
+        self.location.stop_tracking()
 
     def start_saving_location(self):
         self.saving_location = True
@@ -324,21 +313,12 @@ class NPTracking(BaseExperiment):
         self.saving_location = False
         #self.location.stop_saving()
 
-    def start_linking_locations(self):
-        self.logger.debug('Start linking locations')
-        #self.location.start_linking()
-
-    def stop_linking_locations(self):
-        self.logger.debug('Stop linking locations')
-        #self.location.stop_linking()
-
     def localize_particles_image(self, image=None):
         """
         when complete should localize in the image based on a simple peak-finder
 
         """
         pass
-
 
     @property
     def save_stream_running(self):
@@ -387,28 +367,6 @@ class NPTracking(BaseExperiment):
                 self.locations_queue.get()
             self.logger.debug('Location queue cleared')
 
-    def calculate_waterfall(self, image):
-        """ A waterfall is the product of summing together all the vertical values of an image and displaying them
-        as lines on a 2D image. It is how spectrometers normally work. A waterfall can be produced either by binning the
-        image in the vertical direction directly at the camera, or by doing it in software.
-        The first has the advantage of speeding up the readout process. The latter has the advantage of working with any
-        camera.
-        This method will work either with 1D arrays or with 2D arrays and will generate a stack of lines.
-        """
-
-        if self.waterfall_index == self.config['waterfall']['length_waterfall']:
-            self.waterfall_data = np.zeros((self.config['waterfall']['length_waterfall'], self.camera.width))
-            self.waterfall_index = 0
-
-        center_pixel = np.int(self.camera.height / 2)   # Calculates the center of the image
-        vbinhalf = np.int(self.config['waterfall']['vertical_bin'])
-        if vbinhalf >= self.current_height / 2 - 1:
-            wf = np.array([np.sum(image, 1)])
-        else:
-            wf = np.array([np.sum(image[:, center_pixel - vbinhalf:center_pixel + vbinhalf], 1)])
-        self.waterfall_data[self.waterfall_index, :] = wf
-        self.waterfall_index += 1
-        self.publisher.publish('waterfall_data', wf)
 
     def check_background(self):
         """ Checks whether the background is set.
@@ -417,7 +375,7 @@ class NPTracking(BaseExperiment):
         if self.do_background_correction:
             self.logger.info('Setting up the background corretion')
             if self.background_method == self.BACKGROUND_SINGLE_SNAP:
-                self.logger.debug('Bacground single snap')
+                self.logger.debug('Background single snap')
                 if self.background is None or self.background.shape != [self.current_width, self.current_height]:
                     self.logger.warning('Background not set. Defaulting to no background...')
                     self.background = None
