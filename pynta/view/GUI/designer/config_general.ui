@@ -29,7 +29,7 @@
    <item>
     <widget class="QTabWidget" name="config_tabs">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="camera_config">
       <attribute name="title">
@@ -382,7 +382,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QPlainTextEdit" name="txt"/>
+        <widget class="QTextEdit" name="txt"/>
        </item>
       </layout>
      </widget>
