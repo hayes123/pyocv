@@ -89,6 +89,7 @@ class Camera(BaseCamera):
     def read_camera(self):
         moment = time.time()
         sample = self.sb.gen_image()
+        sample[10:20, 40:50] = int(127+127*np.sin(moment))  # added this line for intensity tracking testing
         sample = sample.astype('uint8')
         elapsed = time.time() - moment
         if elapsed > self.exposure.m_as('s'):

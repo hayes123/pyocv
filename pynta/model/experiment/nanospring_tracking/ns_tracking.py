@@ -57,6 +57,12 @@ class NSTracking(BaseExperiment):
         self.keep_acquiring = True
         self.acquiring = False  # Status of the acquisition
         self.tracking = False
+
+        self.monitoring_pixels = False
+        self.monitor_callback = self.callback_pixel
+        self.monitor_callback = self.callback_local_max_and_lock
+        self.temp_monitor_values = {}
+
         self.camera = None  # This will hold the model for the camera
         self.current_height = None
         self.current_width = None
@@ -90,6 +96,49 @@ class NSTracking(BaseExperiment):
         #self.location = LocateParticles(self.publisher, self.config['tracking'])
         self.fps = 0  # Calculates frames per second based on the number of frames received in a period of time
         # sys.excepthook = self.sysexcept  # This is very handy in case there are exceptions that force the program to quit.
+
+    @check_camera  # Don't know yet if this is necessary???
+    def add_monitor_coordinate(self, xy, label=None):
+        """Add a minotor location. If label is None (default) the largest used integer + 1 will be used."""
+        if not 'monitor_coordinates' in self.config:
+            self.config['monitor_coordinates'] = {}
+        if label is None:
+            numbers_used = [k for k in self.config['monitor_coordinates'].keys() if isinstance(k, int)]
+            label = 1 if not numbers_used else max(numbers_used)+1
+        self.config['monitor_coordinates'][label] = xy
+        self.monitoring_pixels = True
+        # print('add_monitor', self.config['monitor_coordinates'])
+        return label
+
+    def clear_monitor_coordinates(self, label=None):
+        """Specify specific label, of clear all by passing None (default)"""
+        if not 'monitor_coordinates' in self.config or label is None:
+            self.config['monitor_coordinates'] = {}
+        elif label in self.config['monitor_coordinates']:
+            del self.config['monitor_coordinates'][label]
+        else:
+            self.logger.warning("Coordinate not found")
+        # If the list is empty, also stop analyzing the frames
+        if self.config['monitor_coordinates'] == {}:
+            self.monitoring_pixels = False
+
+    def callback_pixel(self, img, coord):
+        x, y = coord
+        return img[int(x), int(y)]
+
+    def callback_local_max_and_lock(self, img, coord):
+        x, y = coord
+        rad = 2
+        xmin = int(max(0, x - rad))
+        xmax = int(min(x + rad, img.shape[0]))
+        ymin = int(max(0, y - rad))
+        ymax = int(min(y + rad, img.shape[1]))
+        local = img[xmin:xmax, ymin:ymax]
+        x_, y_ = np.unravel_index(local.argmax(), local.shape)
+        # Update the coordinate to the (new) location of the maximum
+        coord[0] = xmin + x_
+        coord[1] = ymin + y_
+        return local[x_, y_]
 
     def initialize_camera(self):
         """ Initializes the camera to be used to acquire data. The information on the camera should be provided in the
@@ -213,10 +262,20 @@ class NSTracking(BaseExperiment):
                 self.logger.debug('Number of frames: {}'.format(i))
                 if self.do_background_correction and self.background_method == self.BACKGROUND_SINGLE_SNAP:
                     img -= self.background
-
                 # This will broadcast the data just acquired with the current timestamp
                 # The timestamp is very unreliable, especially if the camera has a frame grabber.
                 self.publisher.publish('free_run', [time.time(), img])
+
+                if self.monitoring_pixels:
+                    pixels = {}
+
+                    for label, coord in self.config['monitor_coordinates'].items():
+                        value = self.monitor_callback(img, coord)
+                        pixels[label] = value
+                    self.temp_monitor_values = pixels
+                    # print('in free run', self.temp_monitor_values)
+
+
             self.fps = round(i / (time.time() - t0))
             self.temp_image = img
         self.free_run_running = False
@@ -383,6 +442,7 @@ class NSTracking(BaseExperiment):
 
     def finalize(self):
         general_stop_event.set()
+        self.monitoring_pixels = False
         self.stop_free_run()
         time.sleep(.5)
         self.stop_save_stream()

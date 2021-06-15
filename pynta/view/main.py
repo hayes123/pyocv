@@ -24,6 +24,21 @@ class MainWindow(MainWindowGUI):
         self.update_histogram_worker.data_received.connect(self.update_histogram)
         self.update_histogram_worker.start()
 
+        self.camera_viewer_widget.setup_mouse_click()
+
+    def add_monitor_point(self):
+        self.logger.info('Click to add point.')
+        self.camera_viewer_widget.connect_mouse_clicked(self.add_monitor_point_callback)
+
+    def add_monitor_point_callback(self, coord):
+        print("Adding coordinate", coord)
+        self.experiment.add_monitor_coordinate(coord)
+        self.camera_viewer_widget.connect_mouse_clicked(None)
+        print(self.experiment.config['monitor_coordinates'])
+
+    def clear_monitor_points(self):
+        self.experiment.clear_monitor_coordinates()
+
     def initialize_camera(self):
         self.experiment.initialize_camera()
 
@@ -36,6 +51,9 @@ class MainWindow(MainWindowGUI):
             if self.experiment.tracking:
                 locations = self.experiment.temp_locations
                 self.camera_viewer_widget.draw_target_pointer(locations)
+            if self.experiment.monitoring_pixels:
+                monitor_values = self.experiment.temp_monitor_values
+                self.analysis_dock_widget.intensities_widget.update_graph(monitor_values)
 
     def start_movie(self):
         if self.experiment.free_run_running:
@@ -108,11 +126,11 @@ class MainWindow(MainWindowGUI):
         if len(values) > 0:
             vals = np.array(values)[:, 0]
             vals = vals[~np.isnan(vals)]
-            self.histogram_tracks_widget.histogram_widget.update_distribution(vals)
+            self.analysis_dock_widget.histogram_widget.update_distribution(vals)
 
     def update_tracks(self):
         locations = self.experiment.location.relevant_tracks()
-        self.histogram_tracks_widget.tracks_widget.plot_trajectories(locations)
+        self.analysis_dock_widget.tracks_widget.plot_trajectories(locations)
 
     def update_tracking_config(self, config):
         config = dict(

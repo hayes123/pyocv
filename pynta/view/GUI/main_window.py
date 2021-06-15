@@ -8,7 +8,7 @@ from pynta.util.log import get_logger
 from pynta.view.GUI.camera_viewer_widget import CameraViewerWidget
 from pynta.view.GUI.config_tracking_widget import ConfigTrackingWidget
 from pynta.view.GUI.config_widget import ConfigWidget
-from pynta.view.GUI.histogram_tracks_widget import HistogramTracksWidget
+from pynta.view.GUI.analysis_dock_widget import AnalysisDockWidget
 
 
 class MainWindowGUI(QMainWindow):
@@ -21,9 +21,9 @@ class MainWindowGUI(QMainWindow):
         self.widget_splitter = QSplitter()
 
         self.camera_viewer_widget = CameraViewerWidget()
-        self.histogram_tracks_widget = HistogramTracksWidget(self)
+        self.analysis_dock_widget = AnalysisDockWidget(self)
         self.widget_splitter.addWidget(self.camera_viewer_widget)
-        self.widget_splitter.addWidget(self.histogram_tracks_widget)
+        self.widget_splitter.addWidget(self.analysis_dock_widget)
         self.widget_splitter.setSizes((750, 750))
         self.central_layout.addWidget(self.widget_splitter)
 
@@ -49,8 +49,8 @@ class MainWindowGUI(QMainWindow):
         self.config_widget.apply_config.connect(self.update_config)
 
     def connect_buttons(self):
-        self.histogram_tracks_widget.button_histogram.clicked.connect(self.calculate_histogram)
-        self.histogram_tracks_widget.button_tracks.clicked.connect(self.update_tracks)
+        self.analysis_dock_widget.button_histogram.clicked.connect(self.calculate_histogram)
+        self.analysis_dock_widget.button_tracks.clicked.connect(self.update_tracks)
 
     def connect_actions(self):
         self.actionClose.triggered.connect(self.safe_close)
@@ -77,6 +77,14 @@ class MainWindowGUI(QMainWindow):
         self.actionUpdate_Histogram.triggered.connect(self.calculate_histogram)
         self.actionTracking_Config.triggered.connect(self.config_tracking_widget.show)
         self.actionConfiguration.triggered.connect(self.config_widget.show)
+        self.actionAdd_Monitor_Point.triggered.connect(self.add_monitor_point)
+        self.actionClear_All.triggered.connect(self.clear_monitor_points)
+
+    def add_monitor_point(self):
+        self.logger.debug('Add monitor point')
+
+    def clear_monitor_points(self):
+        self.logger.debug('Clear all monitor points')
 
     def initialize_camera(self):
         self.logger.debug('Initialize Camera')
