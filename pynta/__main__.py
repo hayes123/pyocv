@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 import logging
 from PyQt5.QtWidgets import QApplication
 
-from pynta.model.experiment.nanospring_tracking.np_tracking import NPTracking
+from pynta.model.experiment.nanospring_tracking.ns_tracking import NSTracking
 from pynta.util.log import get_logger
 from pynta.view.main import MainWindow
 
@@ -28,7 +28,7 @@ def main():
         config_file = os.path.join(BASE_DIR, 'util', 'example_config.yml')
     else:
         config_file = args.config_file
-    exp = NPTracking(config_file)
+    exp = NSTracking(config_file)
     exp.initialize_camera()
     app = QApplication([])
     window = MainWindow(exp)

@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 """
+Nanospring tracking
 Localization Routines
 =====================
 Unlike the nanoparticle_tracking experiment of PyNTA which uses trackpy to analyse every frame that is generated,
 the nanospring_tracking experiment uses simple proximity based on the locations in the previous frame.
 The assumption is that particle are anchored and do not get lost or diffuse away from their initial location.
 
-unlike Trackpy linking routine that can be quite sophisticated and CPU consuming, for nanospring locations one only
+Unlike Trackpy linking routine that can be quite sophisticated and CPU consuming, for nanospring locations one only
 needs to know the approximate position of the particles in the previous frame
 :license: GPLv3, see LICENSE for more details
+
+    :last version: 22 March 2021 editted by Sanli Faez
 """
 from copy import copy
 from datetime import datetime
@@ -45,9 +48,6 @@ class LocateParticles:
 
         self.locations = DataFrame()
         self.particle_ids = None
-
-        self.calculating_histograms = False
-        self.histogram_values = []
 
         self._threads = []
 
@@ -333,34 +333,3 @@ def link_queue(locations_queue, publisher_queue, links_queue, **kwargs):
 
 def add_links_to_queue(data, queue):
     queue.put(data)
-
-
-def calculate_histogram_sizes(tracks_queue, config, out_queue):
-    params = config['tracking']['process']
-    df = DataFrame()
-    sleep(5)
-    while True:
-        while not tracks_queue.empty() or tracks_queue.qsize() > 0:
-            data = tracks_queue.get()
-            df = df.append(data)
-
-        if len(df) % 100 == 0:
-            # t1 = tp.filter_stubs(df, params['min_traj_length'])
-            # print(t1.head())
-            # t2 = t1[((t1['mass'] > params['min_mass']) & (t1['size'] < params['max_size']) &
-            #          (t1['ecc'] < params['max_ecc']))]
-            # print(t2.head())
-            # t2 = t1
-            # d = tp.compute_drift(t1)
-            # tm = tp.subtract_drift(t2.copy(), d)
-            im = tp.imsd(df, config['tracking']['process']['um_pixel'], config['camera']['fps'])
-            values = []
-            for pcle in im:
-                data = im[pcle]
-                slope, intercept, r, p, stderr = stats.linregress(np.log(data.index), np.log(data.values))
-                values.append([slope, intercept])
-
-            out_queue.put(values)
-
-        # if len(df) > 100:
-        #     break
